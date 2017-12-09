@@ -1,5 +1,7 @@
 package com.scrap;
 
+import java.util.concurrent.TimeUnit;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -7,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
+　
 /**
  * @author ARUN
  *
@@ -17,7 +20,17 @@ public class AmazonScrapper {
 		final AmazonScrapper scrapObj = new AmazonScrapper();
 		final WebDriver driver = scrapObj.setupFirefoxDriver();
 		try {
+			driver.get("https://www.amazon.com");		
+			
+			try {
+				Thread.sleep(3000);
+			} catch (final InterruptedException e) {
+				//do nothing
+			}
+			
+			scrapObj.login(driver);
 			scrapObj.scrapAmazon(driver);
+			
 		} catch (final Exception e) {
 			if(driver != null) {
 				driver.close();  	//will close browser
@@ -47,14 +60,6 @@ public class AmazonScrapper {
 	}
 	
 	private void scrapAmazon(final WebDriver driver) throws Exception {
-		driver.get("https://www.amazon.com");		
-		
-		try {
-			Thread.sleep(3000);
-		} catch (final InterruptedException e) {
-			//do nothing
-		}
-		
 		final WebElement searchElem = driver.findElement(By.id("twotabsearchtextbox"));		
 		searchElem.sendKeys("iPhone 7");		
 		driver.findElement(By.xpath("/html/body/div[1]/header/div/div[1]/div[3]/div/form/div[2]/div/input")).click();
@@ -75,4 +80,21 @@ public class AmazonScrapper {
 		
 	}
 
+	private void login(WebDriver driver) throws Exception {
+		driver.findElement(By.id("nav-link-accountList")).click();
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			//do nothing
+		}
+		//User name
+		driver.findElement(By.id("ap_email")).sendKeys("<user id>");
+		
+		//Enter Password
+		driver.findElement(By.id("ap_password")).sendKeys("<password>");
+
+		// Click on 'Sign In' button
+		driver.findElement(By.id("signInSubmit")).click();
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	}
 }
